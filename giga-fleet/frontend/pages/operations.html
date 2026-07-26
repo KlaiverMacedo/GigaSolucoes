@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operações - Giga Fleet</title>
+
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/operations.css">
+    <link rel="stylesheet" href="../css/components/navbar.css">
+    <link rel="stylesheet" href="../css/components/cards.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar" id="navbar">
+        <div class="navbar-left">
+            <a href="dashboard.html" class="navbar-logo">
+                <img src="../assets/images/logo-giga.png" alt="Giga">
+                <span>Giga<span class="highlight">Fleet</span></span>
+            </a>
+        </div>
+
+        <div class="navbar-center">
+            <a href="dashboard.html" class="nav-item">
+                <i class="fas fa-home"></i> Dashboard
+            </a>
+            <a href="fleet.html" class="nav-item">
+                <i class="fas fa-truck"></i> Frota
+            </a>
+            <a href="technicians.html" class="nav-item">
+                <i class="fas fa-users"></i> Técnicos
+            </a>
+            <a href="operations.html" class="nav-item active">
+                <i class="fas fa-calendar-check"></i> Operações
+            </a>
+            <a href="planning.html" class="nav-item">
+                <i class="fas fa-clock"></i> Planejamento
+            </a>
+        </div>
+
+        <div class="navbar-right">
+            <span class="navbar-date" id="currentDate"></span>
+            <button class="navbar-notifications">
+                <i class="fas fa-bell"></i>
+                <span class="badge">3</span>
+            </button>
+            <div style="position: relative;">
+                <div class="navbar-user" id="userMenuBtn">
+                    <div class="navbar-avatar" id="userAvatar">A</div>
+                    <div class="navbar-user-info">
+                        <span class="name" id="userName">Administrador</span>
+                        <span class="role" id="userRole">Admin</span>
+                    </div>
+                    <i class="fas fa-chevron-down"
+                        style="font-size: 12px; color: rgba(255,255,255,0.3); margin-left: 4px;"></i>
+                </div>
+                <div class="user-dropdown" id="userDropdown">
+                    <button class="dropdown-item" onclick="window.location.href='profile.html'">
+                        <i class="fas fa-user"></i> Meu Perfil
+                    </button>
+                    <button class="dropdown-item" onclick="window.location.href='settings.html'">
+                        <i class="fas fa-cog"></i> Configurações
+                    </button>
+                    <div class="dropdown-divider"></div>
+                    <button class="dropdown-item danger" id="logoutBtn">
+                        <i class="fas fa-sign-out-alt"></i> Sair
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="dashboard-main">
+        <div class="operations-header">
+            <div class="operations-header-left">
+                <h1>Operações</h1>
+                <p>Gerencie todos os eventos e operações da Giga</p>
+            </div>
+            <div class="operations-header-right">
+                <button class="btn-primary" id="btnNewOperation" style="display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-plus"></i> Nova Operação
+                </button>
+                <button class="btn-secondary" onclick="refreshOperations()">
+                    <i class="fas fa-sync-alt"></i> Atualizar
+                </button>
+            </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="operations-filters">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchOperation" placeholder="Buscar operação por evento ou cliente...">
+            </div>
+            <select id="filterStatusOp">
+                <option value="">Todos os status</option>
+                <option value="AGENDADO">Agendado</option>
+                <option value="EM_MONTAGEM">Em Montagem</option>
+                <option value="EM_OPERACAO">Em Operação</option>
+                <option value="EM_DESMONTAGEM">Em Desmontagem</option>
+                <option value="FINALIZADO">Finalizado</option>
+                <option value="CANCELADO">Cancelado</option>
+            </select>
+            <input type="date" id="filterDate"
+                style="padding: 10px 14px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; color: #ffffff; font-size: 14px;">
+        </div>
+
+        <!-- Lista de Operações -->
+        <div class="operations-list" id="operationsList">
+            <!-- Cards serão inseridos via JavaScript -->
+        </div>
+    </main>
+
+    <!-- Modal - Nova/Editar Operação -->
+    <div class="modal-overlay" id="operationModal">
+        <div class="modal modal-lg">
+            <div class="modal-header">
+                <h2 id="modalTitle">Nova Operação</h2>
+                <button class="modal-close" id="modalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form class="modal-form" id="operationForm">
+                <input type="hidden" id="operationId">
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="eventName">Nome do Evento *</label>
+                        <input type="text" id="eventName" placeholder="Ex: Festival de Música" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="clientName">Cliente *</label>
+                        <select id="clientName" required>
+                            <option value="">Selecione um cliente</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="eventDate">Data do Evento *</label>
+                        <input type="date" id="eventDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="statusOp">Status</label>
+                        <select id="statusOp">
+                            <option value="AGENDADO">Agendado</option>
+                            <option value="EM_MONTAGEM">Em Montagem</option>
+                            <option value="EM_OPERACAO">Em Operação</option>
+                            <option value="EM_DESMONTAGEM">Em Desmontagem</option>
+                            <option value="FINALIZADO">Finalizado</option>
+                            <option value="CANCELADO">Cancelado</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="address">Endereço</label>
+                    <input type="text" id="address" placeholder="Rua, número, cidade...">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="setupTime">Horário Montagem</label>
+                        <input type="time" id="setupTime">
+                    </div>
+                    <div class="form-group">
+                        <label for="breakdownTime">Horário Desmontagem</label>
+                        <input type="time" id="breakdownTime">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="observationsOp">Observações</label>
+                    <textarea id="observationsOp" placeholder="Observações sobre a operação..."></textarea>
+                </div>
+
+                <div class="team-allocation">
+                    <label style="font-weight: 500; color: rgba(255,255,255,0.6); margin-bottom: 8px; display: block;">
+                        <i class="fas fa-users"></i> Alocação de Equipe
+                    </label>
+                    <div class="allocation-row">
+                        <select id="allocVehicle">
+                            <option value="">Veículo</option>
+                        </select>
+                        <select id="allocTechnician">
+                            <option value="">Técnico</option>
+                        </select>
+                        <select id="allocDriver">
+                            <option value="">Motorista</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancel" id="btnCancel">Cancelar</button>
+                    <button type="submit" class="btn-save" id="btnSave">
+                        <i class="fas fa-save"></i> Salvar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Botão Flutuante - Nova Operação -->
+    <button class="fab-button" id="fabNewOperation" title="Nova Operação">
+        <i class="fas fa-plus"></i>
+    </button>
+
+    <!-- Scripts -->
+    <script src="../js/api/client.js"></script>
+    <script src="../js/components/navbar.js"></script>
+    <script src="../js/pages/operations.js"></script>
+</body>
+
+</html>
