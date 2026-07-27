@@ -1,0 +1,51 @@
+services:
+  web:
+    build: ./frontend
+    container_name: giga_web
+    restart: unless-stopped
+    ports:
+      - "3000:5173" # <-- A mudança acontece aqui (Sua Máquina : Dentro do Container)
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - api
+    environment:
+      - VITE_API_URL=http://localhost:5000/api
+
+  api:
+    build: ./backend
+    container_name: giga_api
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./backend:/app
+    environment:
+      - FLASK_APP=run.py
+      - FLASK_ENV=development
+      - DATABASE_URL=postgresql://giga_user:giga_secure_pass@db:5432/giga_sys_db
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:15-alpine
+    container_name: giga_db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=giga_user
+      - POSTGRES_PASSWORD=giga_secure_pass
+      - POSTGRES_DB=giga_sys_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U giga_user -d giga_sys_db" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pg_data:

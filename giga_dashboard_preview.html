@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giga Soluções Audiovisuais - Planejamento Diário</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: #0b0c10;
+            color: #ffffff;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Cores e Variáveis */
+        :root {
+            --bg-dark: #0b0c10;
+            --bg-card: rgba(31, 33, 40, 0.6);
+            --border-glass: rgba(255, 255, 255, 0.08);
+            --accent-blue: #00d2ff;
+            --accent-green: #00ff88;
+            --accent-orange: #ff9900;
+            --text-muted: #8892b0;
+        }
+
+        /* Topbar */
+        .topbar {
+            height: 70px;
+            background: var(--bg-card);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-glass);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 30px;
+            z-index: 10;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-placeholder {
+            font-weight: 700;
+            font-size: 22px;
+            letter-spacing: 1px;
+            color: #fff;
+        }
+
+        .logo-placeholder span {
+            color: var(--accent-blue);
+        }
+
+        .system-title {
+            color: var(--text-muted);
+            font-size: 14px;
+            border-left: 1px solid var(--border-glass);
+            padding-left: 15px;
+            margin-left: 10px;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .datetime {
+            font-size: 13px;
+            color: var(--text-muted);
+            text-align: right;
+        }
+
+        .datetime strong {
+            color: #fff;
+            font-size: 14px;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            border-left: 1px solid var(--border-glass);
+            padding-left: 25px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0052D4, #4364F7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            border: 2px solid var(--accent-blue);
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .user-role {
+            font-size: 12px;
+            color: var(--accent-blue);
+        }
+
+        .btn-icon {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 18px;
+            cursor: pointer;
+            transition: color 0.2s;
+            position: relative;
+        }
+
+        .btn-icon:hover {
+            color: #fff;
+        }
+
+        .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff3366;
+            color: #fff;
+            font-size: 10px;
+            font-weight: bold;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Main Content */
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        /* Sidebar - Técnicos Disponíveis */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-card);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-glass);
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-glass);
+        }
+
+        .sidebar-header h2 {
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .count-badge {
+            background: rgba(0, 255, 136, 0.1);
+            color: var(--accent-green);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+
+        .technicians-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* Drag Items (Técnicos) */
+        .tech-card {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 12px 15px;
+            border-radius: 10px;
+            cursor: grab;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tech-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--accent-green);
+        }
+
+        .tech-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .tech-card:active {
+            cursor: grabbing;
+        }
+
+        .tech-card.dragging {
+            opacity: 0.5;
+            border: 1px dashed var(--accent-blue);
+        }
+
+        .tech-info h4 {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 3px;
+        }
+
+        .tech-info p {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* Board - Planejamento (Operações e Veículos) */
+        .board {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .date-navigator {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+        }
+
+        .date-navigator h1 {
+            font-size: 24px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-date {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glass);
+            color: #fff;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-date:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Colunas de Operação (Cards horizontais) */
+        .operation-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glass);
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            gap: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Detalhes do Evento */
+        .event-details {
+            width: 300px;
+            border-right: 1px dashed var(--border-glass);
+            padding-right: 20px;
+        }
+
+        .event-tag {
+            display: inline-block;
+            background: rgba(0, 210, 255, 0.1);
+            color: var(--accent-blue);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .event-tag.tarde {
+            background: rgba(255, 153, 0, 0.1);
+            color: var(--accent-orange);
+        }
+
+        .event-details h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .event-details p {
+            font-size: 13px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 8px;
+        }
+
+        .event-details p i {
+            color: var(--accent-blue);
+            font-style: normal;
+        }
+
+        .obs-box {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #ccc;
+            margin-top: 15px;
+            border-left: 2px solid #555;
+        }
+
+        /* Veículo e Logística */
+        .vehicle-section {
+            width: 220px;
+            border-right: 1px dashed var(--border-glass);
+            padding-right: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .vehicle-section h4 {
+            font-size: 13px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .vehicle-card {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            border-bottom: 3px solid var(--accent-orange);
+        }
+
+        .vehicle-card.fiorino {
+            border-bottom-color: #a78bfa;
+        }
+
+        /* Cor roxa para Fiorinos, por ex */
+
+        .vehicle-card strong {
+            font-size: 16px;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .vehicle-card span {
+            font-size: 12px;
+            color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        /* Dropzone Equipe */
+        .team-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .team-section h4 {
+            font-size: 13px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .dropzone {
+            flex: 1;
+            border: 2px dashed rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-content: flex-start;
+            transition: all 0.3s;
+            min-height: 120px;
+        }
+
+        .dropzone.dragover {
+            border-color: var(--accent-blue);
+            background: rgba(0, 210, 255, 0.05);
+        }
+
+        .dropzone .tech-card {
+            width: calc(50% - 5px);
+            background: rgba(255, 255, 255, 0.05);
+            border-left-color: var(--accent-blue);
+        }
+
+        /* Scrollbar customizada */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Topbar -->
+    <header class="topbar">
+        <div class="brand">
+            <div class="logo-placeholder">Giga<span>.</span>Sys</div>
+            <div class="system-title">Planejamento Operacional</div>
+        </div>
+
+        <div class="topbar-right">
+            <button class="btn-icon" title="Notificações">
+                🔔 <span class="badge">3</span>
+            </button>
+            <button class="btn-icon" title="Avisos do Sistema">⚙️</button>
+
+            <div class="datetime">
+                <strong id="clock">00:00</strong>
+                <span id="date">Carregando...</span>
+            </div>
+
+            <div class="user-profile">
+                <div class="user-info">
+                    <span class="user-name">Mestre Jedi</span>
+                    <span class="user-role">Administrador</span>
+                </div>
+                <div class="avatar">MJ</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="main-container">
+
+        <!-- SIDEBAR: Técnicos Disponíveis -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Técnicos <span class="count-badge" id="tech-count">8 Livres</span></h2>
+            </div>
+
+            <div class="technicians-list dropzone" id="pool-tecnicos">
+                <!-- Cards arrastáveis -->
+                <div class="tech-card" draggable="true" id="t1">
+                    <div class="tech-info">
+                        <h4>WELLINGTON</h4>
+                        <p>Técnico de Áudio</p>
+                    </div>
+                </div>
+                <div class="tech-card" draggable="true" id="t2">
+                    <div class="tech-info">
+                        <h4>MARQUINHOS</h4>
+                        <p>Iluminação</p>
+                    </div>
+                </div>
+                <div class="tech-card" draggable="true" id="t3">
+                    <div class="tech-info">
+                        <h4>GABRIEL</h4>
+                        <p>Projeção / LED</p>
+                    </div>
+                </div>
+                <div class="tech-card" draggable="true" id="t4">
+                    <div class="tech-info">
+                        <h4>FELIPE</h4>
+                        <p>Assistente Técnico</p>
+                    </div>
+                </div>
+                <div class="tech-card" draggable="true" id="t5">
+                    <div class="tech-info">
+                        <h4>LEIA</h4>
+                        <p>Produção / Logística</p>
+                    </div>
+                </div>
+                <div class="tech-card" draggable="true" id="t6">
+                    <div class="tech-info">
+                        <h4>LEO M.</h4>
+                        <p>Assistente Técnico</p>
+                    </div>
+                </div>
+                <div class="tech-card" draggable="true" id="t7">
+                    <div class="tech-info">
+                        <h4>EDINHO</h4>
+                        <p>Técnico Geral</p>
+                    </div>
+                </div>
+                <div class="tech-card" draggable="true" id="t8">
+                    <div class="tech-info">
+                        <h4>DVD</h4>
+                        <p>Painel de LED</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- BOARD: Planejamento Logístico -->
+        <section class="board">
+
+            <div class="date-navigator">
+                <button class="btn-date">← Anterior</button>
+                <h1>DIA 02 - QUINTA FEIRA</h1>
+                <button class="btn-date">Próximo →</button>
+            </div>
+
+            <!-- CARD OPERACIONAL 1 -->
+            <article class="operation-card">
+                <div class="event-details">
+                    <span class="event-tag">Período Manhã</span>
+                    <h3>82510 - HOTEL DEVILLE</h3>
+                    <p><i>📍</i> (START) Montagem</p>
+                    <p><i>⏰</i> Início às 07H30</p>
+                    <div class="obs-box">
+                        <strong>Obs:</strong> Levar cabos RCA. Vai direto para o evento.
+                    </div>
+                </div>
+
+                <div class="vehicle-section">
+                    <h4>Veículo Alocado</h4>
+                    <div class="vehicle-card fiorino">
+                        <strong>FIORINO</strong>
+                        <span>SEU3E16</span>
+                    </div>
+                </div>
+
+                <div class="team-section">
+                    <h4>Equipe neste Veículo/Evento <span>Arraste aqui</span></h4>
+                    <div class="dropzone" id="drop-evento-1">
+                        <!-- Técnicos arrastados cairão aqui -->
+                    </div>
+                </div>
+            </article>
+
+            <!-- CARD OPERACIONAL 2 -->
+            <article class="operation-card">
+                <div class="event-details">
+                    <span class="event-tag tarde">Período Tarde</span>
+                    <h3>82533 - HINNOVAH</h3>
+                    <p><i>📍</i> MUSEU OSCAR NIEMEYER (FOYER)</p>
+                    <p><i>⏰</i> Início às 16H00</p>
+                    <div class="obs-box">
+                        <strong>Operador:</strong> Marcos (Montagem + Operação)
+                    </div>
+                </div>
+
+                <div class="vehicle-section">
+                    <h4>Veículo Alocado</h4>
+                    <div class="vehicle-card">
+                        <strong>SCUDO</strong>
+                        <span>SET5G18</span>
+                    </div>
+                </div>
+
+                <div class="team-section">
+                    <h4>Equipe neste Veículo/Evento <span>Arraste aqui</span></h4>
+                    <div class="dropzone" id="drop-evento-2">
+                        <!-- Técnicos arrastados cairão aqui -->
+                    </div>
+                </div>
+            </article>
+
+            <!-- CARD OPERACIONAL 3 (Retirada) -->
+            <article class="operation-card" style="opacity: 0.8;">
+                <div class="event-details">
+                    <span class="event-tag">Período Manhã</span>
+                    <h3>82451 - HOTEL TREVI</h3>
+                    <p><i>📍</i> Retirada de Equipamentos</p>
+                    <p><i>⏰</i> Até 11H30</p>
+                </div>
+
+                <div class="vehicle-section">
+                    <h4>Veículo Alocado</h4>
+                    <div class="vehicle-card fiorino">
+                        <strong>FIORINO</strong>
+                        <span>TAROH08</span>
+                    </div>
+                </div>
+
+                <div class="team-section">
+                    <h4>Equipe neste Veículo/Evento <span>Arraste aqui</span></h4>
+                    <div class="dropzone" id="drop-evento-3">
+                        <!-- Técnicos arrastados cairão aqui -->
+                    </div>
+                </div>
+            </article>
+
+        </section>
+    </main>
+
+    <script>
+        // --- RELÓGIO SUPERIOR ---
+        function updateClock() {
+            const now = new Date();
+            const time = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            const date = now.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short' });
+            document.getElementById('clock').innerText = time;
+            document.getElementById('date').innerText = date.toUpperCase();
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // --- LÓGICA DE DRAG AND DROP (Vanilla JS para simular o React) ---
+        const draggables = document.querySelectorAll('.tech-card');
+        const dropzones = document.querySelectorAll('.dropzone');
+        const techCountBadge = document.getElementById('tech-count');
+        const pool = document.getElementById('pool-tecnicos');
+
+        // Atualiza contagem de livres
+        function updateCount() {
+            const count = pool.querySelectorAll('.tech-card').length;
+            techCountBadge.innerText = `${count} Livres`;
+            if (count === 0) techCountBadge.style.color = '#8892b0';
+            else techCountBadge.style.color = 'var(--accent-green)';
+        }
+
+        draggables.forEach(draggable => {
+            draggable.addEventListener('dragstart', () => {
+                draggable.classList.add('dragging');
+            });
+
+            draggable.addEventListener('dragend', () => {
+                draggable.classList.remove('dragging');
+                updateCount();
+            });
+        });
+
+        dropzones.forEach(zone => {
+            zone.addEventListener('dragover', e => {
+                e.preventDefault(); // Permite o drop
+                zone.classList.add('dragover');
+
+                // Determina a posição para inserir
+                const afterElement = getDragAfterElement(zone, e.clientY);
+                const draggable = document.querySelector('.dragging');
+
+                if (afterElement == null) {
+                    zone.appendChild(draggable);
+                } else {
+                    zone.insertBefore(draggable, afterElement);
+                }
+            });
+
+            zone.addEventListener('dragleave', () => {
+                zone.classList.remove('dragover');
+            });
+
+            zone.addEventListener('drop', () => {
+                zone.classList.remove('dragover');
+                // Simula uma chamada à API de alocação de técnico -> carro -> evento
+            });
+        });
+
+        // Função auxiliar para ordernar durante o Drag
+        function getDragAfterElement(container, y) {
+            const draggableElements = [...container.querySelectorAll('.tech-card:not(.dragging)')];
+
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = y - box.top - box.height / 2;
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return closest;
+                }
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
+    </script>
+</body>
+
+</html>

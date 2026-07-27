@@ -1,0 +1,141 @@
+/* Container Geral do Dashboard */
+.dashboard-container {
+    padding: 30px 40px;
+    width: 100vw;
+    height: 100vh;
+    background: #0b0c10;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.dashboard-header {
+    margin-bottom: 25px;
+}
+
+.dashboard-header h2 {
+    color: #00d2ff;
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.dashboard-header p {
+    color: #8892b0;
+    font-size: 13px;
+    margin-top: 5px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+
+/* Grid de Colunas (Kanban / Painel) */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    flex: 1;
+    padding-bottom: 30px;
+}
+
+/* Coluna Individual */
+.kanban-column {
+    background: rgba(31, 33, 40, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    backdrop-filter: blur(12px);
+    max-height: 72vh;
+}
+
+.kanban-column h3 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #ccd6f6;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.kanban-column h3 span {
+    background: rgba(0, 210, 255, 0.1);
+    color: #00d2ff;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+
+/* Lista de Cards com Scroll Interno */
+.cards-list {
+    overflow-y: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-right: 5px;
+}
+
+.cards-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+.cards-list::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+/* Card Individual */
+.kanban-card {
+    background: rgba(20, 22, 28, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-left: 3px solid #00d2ff;
+    border-radius: 10px;
+    padding: 14px;
+    transition: all 0.2s ease;
+}
+
+.kanban-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(0, 210, 255, 0.3);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+.kanban-card.veiculo {
+    border-left-color: #4364F7;
+}
+
+.kanban-card.alocacao {
+    border-left-color: #6FB1FC;
+}
+
+.card-title {
+    font-weight: 600;
+    font-size: 14px;
+    color: #fff;
+    margin-bottom: 6px;
+}
+
+.card-info {
+    font-size: 12px;
+    color: #8892b0;
+    margin-bottom: 3px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.card-badge {
+    display: inline-block;
+    background: rgba(0, 210, 255, 0.15);
+    color: #00d2ff;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-top: 8px;
+    text-transform: uppercase;
+    font-weight: 600;
+}

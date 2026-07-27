@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giga Soluções Audiovisuais - Acesso ao Sistema</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { background-color: #0b0c10; color: #ffffff; overflow: hidden; height: 100vh; display: flex; justify-content: center; align-items: center; }
+        
+        /* Canvas de Fundo */
+        #canvas-bg { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; opacity: 0.8; }
+        
+        /* Container Principal */
+        .login-wrapper { position: relative; z-index: 10; width: 100%; max-width: 420px; padding: 20px; perspective: 1000px; }
+        
+        /* Efeito Glassmorphism */
+        .login-card {
+            background: rgba(31, 33, 40, 0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 45px 40px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+            transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
+        /* Espaço onde entrará a logomarca que você tem */
+        .logo-placeholder {
+            width: 100%; height: 100px; margin-bottom: 35px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(255,255,255,0.05));
+            border-radius: 12px; display: flex; justify-content: center; align-items: center;
+            font-weight: 700; font-size: 28px; letter-spacing: 2px; color: #fff;
+            border: 1px dashed rgba(255,255,255,0.2);
+            flex-direction: column;
+        }
+        
+        .logo-placeholder span { color: #00d2ff; }
+        .logo-sub { font-size: 11px; font-weight: 300; letter-spacing: 4px; color: #8892b0; margin-top: 5px; text-transform: uppercase;}
+        
+        /* Inputs */
+        .input-group { margin-bottom: 22px; position: relative; }
+        .input-group label { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; color: #8892b0; font-weight: 600; }
+        .input-group input {
+            width: 100%; padding: 15px 15px 15px 45px; background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 10px;
+            color: #fff; font-size: 15px; outline: none; transition: all 0.3s;
+        }
+        
+        /* Ícones falsos usando CSS content para os inputs */
+        .input-group::before {
+            content: '👤'; position: absolute; left: 15px; top: 35px; font-size: 14px; opacity: 0.5; transition: all 0.3s;
+        }
+        .input-group:nth-child(2)::before { content: '🔒'; top: 35px; }
+
+        .input-group input:focus { border-color: #00d2ff; box-shadow: 0 0 15px rgba(0, 210, 255, 0.2); background: rgba(0,0,0,0.5); }
+        .input-group input:focus + ::before { opacity: 1; text-shadow: 0 0 8px #00d2ff; }
+        
+        /* Botão */
+        .btn-login {
+            width: 100%; padding: 16px; margin-top: 15px;
+            background: linear-gradient(90deg, #0052D4 0%, #4364F7 50%, #6FB1FC 100%);
+            background-size: 200% auto;
+            border: none; border-radius: 10px; color: #fff; font-size: 16px; font-weight: 600;
+            cursor: pointer; transition: 0.5s; display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 10px 20px rgba(67, 100, 247, 0.3);
+        }
+        .btn-login:hover { background-position: right center; transform: translateY(-2px); box-shadow: 0 15px 25px rgba(67, 100, 247, 0.5); }
+        
+        /* Loader do botão */
+        .spinner { display: none; width: 22px; height: 22px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-in-out infinite; margin-right: 10px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .loading .spinner { display: block; }
+        .loading .btn-text { display: none; }
+        
+        /* Video Container (Oculto inicialmente) */
+        .video-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: #000; z-index: 50; display: none; opacity: 0; transition: opacity 1.5s ease;
+            justify-content: center; align-items: center;
+        }
+        .video-overlay.active { display: flex; opacity: 1; }
+        .video-overlay video { width: 100%; height: 100%; object-fit: cover; }
+        
+        /* Barra de progresso do vídeo mockada */
+        .video-progress { position: absolute; bottom: 0; left: 0; height: 4px; background: #00d2ff; width: 0%; z-index: 51; transition: width 0.1s linear;}
+        
+        /* Fade Out anim */
+        .fade-out { opacity: 0; transform: translateY(-20px); pointer-events: none; }
+        
+        /* Animação Inicial de Entrada */
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .login-card { animation: fadeInUp 0.8s cubic-bezier(0.25, 0.8, 0.25, 1) forwards; }
+    </style>
+</head>
+<body>
+
+    <!-- Fundo Animado (Partículas/Feixes de luz) -->
+    <canvas id="canvas-bg"></canvas>
+
+    <!-- Overlay do Vídeo Institucional -->
+    <div class="video-overlay" id="video-overlay">
+        <!-- Substituir este src fictício pelo caminho local na pasta assets/ do seu backend -->
+        <video id="intro-video" playsinline>
+            <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+            Seu navegador não suporta o formato de vídeo.
+        </video>
+        <div class="video-progress" id="video-progress"></div>
+    </div>
+
+    <!-- Tela de Login -->
+    <div class="login-wrapper" id="login-wrapper">
+        <div class="login-card">
+            <!-- AQUI ENTRARÁ A SUA LOGOMARCA (tag <img>) -->
+            <div class="logo-placeholder">
+                Giga<span>.</span>Sys
+                <div class="logo-sub">Soluções Audiovisuais</div>
+            </div>
+            
+            <form id="login-form">
+                <div class="input-group">
+                    <label>Usuário / Matrícula</label>
+                    <input type="text" id="username" placeholder="ex: master@giga" required autocomplete="off">
+                </div>
+                <div class="input-group">
+                    <label>Senha de Acesso</label>
+                    <input type="password" id="password" placeholder="••••••••" required>
+                </div>
+                
+                <button type="submit" class="btn-login" id="btn-login">
+                    <div class="spinner"></div>
+                    <span class="btn-text">Iniciar Sessão</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // --- ANIMAÇÃO DO CANVAS (ESTILO SINAIS AUDIOVISUAIS / REDE) ---
+        const canvas = document.getElementById('canvas-bg');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let particlesArray = [];
+        
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2.5 + 0.5;
+                this.speedX = (Math.random() * 1.5) - 0.75;
+                this.speedY = (Math.random() * 1.5) - 0.75;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x > canvas.width || this.x < 0) this.speedX = -this.speedX;
+                if (this.y > canvas.height || this.y < 0) this.speedY = -this.speedY;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(67, 100, 247, 0.4)';
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particlesArray = [];
+            let numberOfParticles = (canvas.width * canvas.height) / 8000;
+            for (let i = 0; i < numberOfParticles; i++) {
+                particlesArray.push(new Particle());
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+                particlesArray[i].draw();
+                
+                // Conectar partículas próximas (linhas de conexão fluidas)
+                for (let j = i; j < particlesArray.length; j++) {
+                    const dx = particlesArray[i].x - particlesArray[j].x;
+                    const dy = particlesArray[i].y - particlesArray[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < 130) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(0, 210, 255, ${0.2 - distance/130})`;
+                        ctx.lineWidth = 1;
+                        ctx.moveTo(particlesArray[i].x, particlesArray[i].y);
+                        ctx.lineTo(particlesArray[j].x, particlesArray[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animateParticles);
+        }
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            initParticles();
+        });
+
+        initParticles();
+        animateParticles();
+
+        // --- LÓGICA DE AUTENTICAÇÃO E TRANSIÇÃO PARA O VÍDEO ---
+        const loginForm = document.getElementById('login-form');
+        const btnLogin = document.getElementById('btn-login');
+        const loginWrapper = document.getElementById('login-wrapper');
+        const videoOverlay = document.getElementById('video-overlay');
+        const introVideo = document.getElementById('intro-video');
+        const videoProgress = document.getElementById('video-progress');
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // 1. Inicia animação visual de processamento (sem travar)
+            btnLogin.classList.add('loading');
+            btnLogin.disabled = true;
+
+            // 2. Mock de requisição na API (Ex: validando token e permissões - 2 segundos)
+            setTimeout(() => {
+                // 3. Fade Out suave do form de login
+                loginWrapper.classList.add('fade-out');
+                
+                // 4. Exibe e reproduz o vídeo institucional
+                setTimeout(() => {
+                    videoOverlay.classList.add('active');
+                    
+                    // Como houve interação (click no botão), os navegadores permitem o autoplay com som.
+                    introVideo.play().catch(e => {
+                        console.warn("Autoplay falhou ou requer muted:", e);
+                        introVideo.muted = true; 
+                        introVideo.play();
+                    });
+                }, 600); // tempo do fade out do login
+            }, 2000);
+        });
+
+        // 5. Atualiza barra de progresso do vídeo
+        introVideo.addEventListener('timeupdate', () => {
+            const progress = (introVideo.currentTime / introVideo.duration) * 100;
+            videoProgress.style.width = `${progress}%`;
+        });
+
+        // 6. Transição final para o Dashboard (após o vídeo)
+        introVideo.addEventListener('ended', () => {
+            // Esmaece o vídeo
+            videoOverlay.style.opacity = '0';
+            
+            setTimeout(() => {
+                videoOverlay.style.display = 'none';
+                
+                // --- INJETAR O DASHBOARD AQUI NA APLICAÇÃO REAL ---
+                document.body.style.background = '#f4f7fe'; // Cor clara de exemplo pro dashboard
+                document.body.innerHTML = `
+                    <div style="color: #333; text-align: center; padding-top: 20vh; font-family: Inter;">
+                        <h1 style="font-size: 32px; margin-bottom: 10px;">Bem-vindo à Giga Soluções Audiovisuais</h1>
+                        <p style="color: #666; margin-bottom: 30px;">Carregando painel logístico (Drag and Drop)...</p>
+                        <div class="spinner" style="border-top-color: #0052D4; display: inline-block; margin: 0 auto;"></div>
+                    </div>
+                `;
+                // window.location.href = '/dashboard';
+            }, 1000); // espera o fade out terminar
+        });
+    </script>
+</body>
+</html>

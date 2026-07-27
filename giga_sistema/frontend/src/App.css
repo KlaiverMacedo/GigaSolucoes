@@ -1,0 +1,163 @@
+/* Container Principal */
+.login-wrapper {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 420px;
+  padding: 20px;
+  perspective: 1000px;
+}
+
+/* Efeito Glassmorphism */
+.login-card {
+  background: rgba(31, 33, 40, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 45px 40px;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  animation: fadeInUp 0.8s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+}
+
+/* Espaço da Logomarca */
+.logo-placeholder {
+  width: 100%;
+  height: 100px;
+  margin-bottom: 35px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.05));
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 700;
+  font-size: 28px;
+  letter-spacing: 2px;
+  color: #fff;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  flex-direction: column;
+}
+
+.logo-placeholder span {
+  color: #00d2ff;
+}
+
+.logo-sub {
+  font-size: 11px;
+  font-weight: 300;
+  letter-spacing: 4px;
+  color: #8892b0;
+  margin-top: 5px;
+  text-transform: uppercase;
+}
+
+/* Inputs */
+.input-group {
+  margin-bottom: 22px;
+  position: relative;
+}
+
+.input-group label {
+  display: block;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  color: #8892b0;
+  font-weight: 600;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 15px 15px 15px 15px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  color: #fff;
+  font-size: 15px;
+  outline: none;
+  transition: all 0.3s;
+}
+
+.input-group input:focus {
+  border-color: #00d2ff;
+  box-shadow: 0 0 15px rgba(0, 210, 255, 0.2);
+  background: rgba(0, 0, 0, 0.5);
+}
+
+/* Botão */
+.btn-login {
+  width: 100%;
+  padding: 16px;
+  margin-top: 15px;
+  background: linear-gradient(90deg, #0052D4 0%, #4364F7 50%, #6FB1FC 100%);
+  background-size: 200% auto;
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.5s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 10px 20px rgba(67, 100, 247, 0.3);
+}
+
+.btn-login:hover {
+  background-position: right center;
+  transform: translateY(-2px);
+  box-shadow: 0 15px 25px rgba(67, 100, 247, 0.5);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --- Overlay do Vídeo Institucional --- */
+.video-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #000;
+  z-index: 50;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1s ease-in-out;
+}
+
+.video-overlay.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.video-overlay video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Transição de saída do Login */
+.login-wrapper {
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.login-wrapper.fade-out {
+  opacity: 0;
+  transform: translateY(-20px);
+  pointer-events: none;
+}
